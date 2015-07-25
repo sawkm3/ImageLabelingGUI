@@ -1,0 +1,4 @@
+1,999,22,0,0,[aaa,0,---,$#%&*+,  ,Ç†Ç¢Ç§Ç¶Ç®Ç©Ç´Ç≠ÇØÇ±,aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa]
+2,11,333,0,1,[a,b]
+3,1,4,1,0,[0, 1]
+4,10028,55555555,0,0,[Å@,3.1415926535897]
