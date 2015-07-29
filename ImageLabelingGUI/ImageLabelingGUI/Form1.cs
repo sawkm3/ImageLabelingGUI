@@ -32,13 +32,13 @@ namespace ImageLabelingGUI
             files = new List<KeyValuePair<int,string>>();
 
             // test images
-            files.Add(new KeyValuePair<int, string>(1, "D:/github/ImageLabelingGUI/Image/1.jpg"));
-            files.Add(new KeyValuePair<int, string>(2, "D:/github/ImageLabelingGUI/Image/2.jpg"));
-            files.Add(new KeyValuePair<int, string>(2, "D:/github/ImageLabelingGUI/Image/3.jpg"));
-            files.Add(new KeyValuePair<int, string>(0, "D:/github/ImageLabelingGUI/Image/4.jpg"));
-            files.Add(new KeyValuePair<int, string>(2, "D:/github/ImageLabelingGUI/Image/5.jpg"));
-            files.Add(new KeyValuePair<int, string>(1, "D:/github/ImageLabelingGUI/Image/6.jpg"));
-            files.Add(new KeyValuePair<int, string>(0, "D:/github/ImageLabelingGUI/Image/7.jpg"));
+            files.Add(new KeyValuePair<int, string>(1, "../../../../Image/1.jpg"));
+            files.Add(new KeyValuePair<int, string>(2, "../../../../Image/2.jpg"));
+            files.Add(new KeyValuePair<int, string>(2, "../../../../Image/3.jpg"));
+            files.Add(new KeyValuePair<int, string>(0, "../../../../Image/4.jpg"));
+            files.Add(new KeyValuePair<int, string>(2, "../../../../Image/5.jpg"));
+            files.Add(new KeyValuePair<int, string>(1, "../../../../Image/6.jpg"));
+            files.Add(new KeyValuePair<int, string>(0, "../../../../Image/7.jpg"));
 
             this.markerThumbnailPanel1.Settings(files.ToArray());
             this.markerThumbnailPanel1.ThumbnailSelected += Form1_ThumbnailSelected;
