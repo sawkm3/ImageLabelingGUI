@@ -84,13 +84,14 @@ namespace ImageLabelingGUI
             this.splitter1.Size = new System.Drawing.Size(3, 603);
             this.splitter1.TabIndex = 4;
             this.splitter1.TabStop = false;
+            this.splitter1.SplitterMoved += new System.Windows.Forms.SplitterEventHandler(this.splitter1_SplitterMoved);
             // 
             // markerThumbnailPanel1
             // 
-            this.markerThumbnailPanel1.AutoScroll = true;
             this.markerThumbnailPanel1.AutoSize = true;
             this.markerThumbnailPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.markerThumbnailPanel1.Location = new System.Drawing.Point(598, 24);
+            this.markerThumbnailPanel1.Margin = new System.Windows.Forms.Padding(0);
             this.markerThumbnailPanel1.Name = "markerThumbnailPanel1";
             this.markerThumbnailPanel1.Size = new System.Drawing.Size(227, 603);
             this.markerThumbnailPanel1.TabIndex = 3;
@@ -107,6 +108,7 @@ namespace ImageLabelingGUI
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "Form1";
             this.Text = "ImageLabelingGUI";
+            this.SizeChanged += new System.EventHandler(this.Form1_SizeChanged);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();

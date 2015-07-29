@@ -63,7 +63,7 @@ namespace ImageLabelingGUI
             InitializeComponent();
 
             // mouse wheel event
-            this.MouseWheel += MarkerThumbnailPanel_MouseWheel;
+            ThumbnailPanel.MouseWheel += ThumbnailPanel_MouseWheel;
         }
 
         public void Settings(KeyValuePair<int, string>[] filePathArray)
@@ -79,7 +79,7 @@ namespace ImageLabelingGUI
             ResetComponentsBounds();
 
             // reset scroll value
-            this.VerticalScroll.Value = 0;
+            ThumbnailPanel.VerticalScroll.Value = 0;
 
             // reset selected number
             selectedNumber = 0;
@@ -91,13 +91,17 @@ namespace ImageLabelingGUI
 
             int thumbnailNum = files.Length;
 
+            // panel1 size
+            ThumbnailPanel.Width = this.Width - markerLineWidth;
+            ThumbnailPanel.Height = this.Height;
+
             // thumbnailPanel width
-            pictureBox1.Width = this.Width - scrollWidth;
+            pictureBox1.Width = ThumbnailPanel.Width - scrollWidth;
 
             // thumbnailRect
             thumbnailRect.X = offsetThumbnail;
             thumbnailRect.Y = offsetThumbnail;
-            thumbnailRect.Width = pictureBox1.Width - markerLineWidth * 2 - thumbnailRect.X * 2;
+            thumbnailRect.Width = pictureBox1.Width - markerLineWidth - thumbnailRect.X * 2;
             thumbnailRect.Height = (int)(thumbnailRect.Width * aspectRatio);
 
             // set thumbnailTile size
@@ -106,16 +110,20 @@ namespace ImageLabelingGUI
 
             // thumbnailPanel height
             int newHeight = thumbnailTileHeight * thumbnailNum;
-            pictureBox1.Height = (newHeight < this.Height) ? this.Height : newHeight;
+            pictureBox1.Height = (newHeight < ThumbnailPanel.Height) ? ThumbnailPanel.Height : newHeight;
 
             RecalculateDisplay();
 
             // set scroll margin
-            this.VerticalScroll.SmallChange = this.VerticalScroll.Maximum / thumbnailNum;
-            this.VerticalScroll.LargeChange = this.VerticalScroll.SmallChange * (displayNum - 2);
+            ThumbnailPanel.VerticalScroll.SmallChange = ThumbnailPanel.VerticalScroll.Maximum / thumbnailNum;
+            ThumbnailPanel.VerticalScroll.LargeChange = ThumbnailPanel.VerticalScroll.SmallChange * (displayNum - 2);
 
             // create marker
             CreateScrollMarker();
+
+            // set marker picturebox location
+            pictureBox2.Location = new Point(ThumbnailPanel.Width, scrollWidth);
+            pictureBox2.Size = scrollMarker.Size;
         }
 
         private void RecalculateDisplay()
@@ -125,12 +133,12 @@ namespace ImageLabelingGUI
             int oldTopImageNumber = topImageNumber;
 
             // change topImageNumber by scroll value ratio
-            topImageNumber = (int)(files.Length * this.VerticalScroll.Value / (double)this.VerticalScroll.Maximum);
+            topImageNumber = (int)(files.Length * ThumbnailPanel.VerticalScroll.Value / (double)ThumbnailPanel.VerticalScroll.Maximum);
 
             int oldDisplayNum = displayNum;
 
             // num of visible thumbnail files
-            displayNum = this.Height / thumbnailTileHeight + 2;
+            displayNum = ThumbnailPanel.Height / thumbnailTileHeight + 2;
             if (thumbnailNum < topImageNumber + displayNum) displayNum = thumbnailNum - topImageNumber;
 
             // create thumbnail image
@@ -181,6 +189,7 @@ namespace ImageLabelingGUI
             if (scrollMarker != null && scrollMarker.Height == height) return;
 
             // create bitmap
+            if (scrollMarker != null) scrollMarker.Dispose();
             scrollMarker = new Bitmap(markerLineWidth, height);
 
             Graphics g = Graphics.FromImage(scrollMarker);
@@ -236,12 +245,17 @@ namespace ImageLabelingGUI
                 if (i != topImageNumber)
                     g.DrawLine(Pens.LightGray, markerLineWidth + halfOffset, height, thumbnailTileWidth + halfOffset, height);
             }
-
-            // draw scroll marker
-            g.DrawImage(scrollMarker, thumbnailTileWidth + markerLineWidth, scrollWidth + this.VerticalScroll.Value);
         }
 
-        private void MarkerThumbnailPanel_SizeChanged(object sender, EventArgs e)
+        private void pictureBox2_Paint(object sender, PaintEventArgs e)
+        {
+            Graphics g = e.Graphics;
+
+            // draw scroll marker
+            g.DrawImage(scrollMarker, 0, 0);
+        }
+
+        private void ThumbnailPanel_SizeChanged(object sender, EventArgs e)
         {
             // if this size changed, refresh this and childs bounds
             ResetComponentsBounds();
@@ -249,12 +263,12 @@ namespace ImageLabelingGUI
             pictureBox1.Refresh();
         }
 
-        private void MarkerThumbnailPanel_Scroll(object sender, ScrollEventArgs e)
+        private void ThumbnailPanel_Scroll(object sender, ScrollEventArgs e)
         {
             // moved bertival scroll
             if (e.ScrollOrientation == ScrollOrientation.VerticalScroll)
             {
-                if (this.VerticalScroll.Maximum < 0) return;
+                if (ThumbnailPanel.VerticalScroll.Maximum < 0) return;
 
                 RecalculateDisplay();
 
@@ -262,7 +276,7 @@ namespace ImageLabelingGUI
             }
         }
 
-        private void MarkerThumbnailPanel_MouseWheel(object sender, MouseEventArgs e)
+        private void ThumbnailPanel_MouseWheel(object sender, MouseEventArgs e)
         {
             // when the scroll bar move by mouse wheel, why the scroll event is not called ?
             if (e.Delta != 0)
@@ -277,7 +291,7 @@ namespace ImageLabelingGUI
 
                 ThumbnailSelected(selectedNumber);
 
-               pictureBox1.Refresh();
+                pictureBox1.Refresh();
             }
         }
 
@@ -306,6 +320,16 @@ namespace ImageLabelingGUI
         {
             if (number < min) number = min;
             if (max <= number) number = max - 1;
+        }
+
+        private void MarkerThumbnailPanel_Resize(object sender, EventArgs e)
+        {
+            ResetComponentsBounds();
+        }
+
+        private void pictureBox1_MouseEnter(object sender, EventArgs e)
+        {
+            ThumbnailPanel.Focus();
         }
     }
 }

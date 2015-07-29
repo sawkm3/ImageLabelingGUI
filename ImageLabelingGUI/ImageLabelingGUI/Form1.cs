@@ -38,7 +38,13 @@ namespace ImageLabelingGUI
             files.Add(new KeyValuePair<int, string>(0, "../../../../Image/4.jpg"));
             files.Add(new KeyValuePair<int, string>(2, "../../../../Image/5.jpg"));
             files.Add(new KeyValuePair<int, string>(1, "../../../../Image/6.jpg"));
-            files.Add(new KeyValuePair<int, string>(0, "../../../../Image/7.jpg"));
+            //files.Add(new KeyValuePair<int, string>(0, "../../../../Image/7.jpg"));
+            //files.Add(new KeyValuePair<int, string>(1, "../../../../Image/1.png"));
+            //files.Add(new KeyValuePair<int, string>(2, "../../../../Image/2.png"));
+            //files.Add(new KeyValuePair<int, string>(2, "../../../../Image/3.png"));
+            //files.Add(new KeyValuePair<int, string>(0, "../../../../Image/4.png"));
+            //files.Add(new KeyValuePair<int, string>(2, "../../../../Image/5.png"));
+            //files.Add(new KeyValuePair<int, string>(1, "../../../../Image/6.png"));
 
             this.markerThumbnailPanel1.Settings(files.ToArray());
             this.markerThumbnailPanel1.ThumbnailSelected += Form1_ThumbnailSelected;
@@ -68,6 +74,16 @@ namespace ImageLabelingGUI
             selectedImage.Dispose();
         }
 
+        private void Form1_SizeChanged(object sender, EventArgs e)
+        {
+            markerThumbnailPanel1.Refresh();
+            pictureBox1.Refresh();
+        }
 
+        private void splitter1_SplitterMoved(object sender, SplitterEventArgs e)
+        {
+            markerThumbnailPanel1.Refresh();
+            pictureBox1.Refresh();
+        }
     }
 }
