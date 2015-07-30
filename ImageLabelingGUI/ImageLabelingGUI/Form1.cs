@@ -19,17 +19,17 @@ namespace ImageLabelingGUI
 {
     public partial class Form1 : Form
     {
-        private List<KeyValuePair<int, string>> files;
-        private int id;
-
-        private readonly Color[] backColors = new Color[] { System.Drawing.SystemColors.Control, Color.LightSkyBlue, Color.LightPink };
+        private readonly Color[] backColors = new Color[] { System.Drawing.SystemColors.Control, Color.LightSkyBlue, Color.LightPink, Color.Gray };
 
         public Form1()
         {
             InitializeComponent();
 
-            // set files info
-            files = new List<KeyValuePair<int,string>>();
+            // set minimum
+            this.MinimumSize = this.Size - this.ClientSize + new Size(400, 400);
+
+            // create files info
+            List<KeyValuePair<int, string>> files = new List<KeyValuePair<int, string>>();
 
             // test images
             files.Add(new KeyValuePair<int, string>(1, "../../../../Image/1.jpg"));
@@ -38,7 +38,8 @@ namespace ImageLabelingGUI
             files.Add(new KeyValuePair<int, string>(0, "../../../../Image/4.jpg"));
             files.Add(new KeyValuePair<int, string>(2, "../../../../Image/5.jpg"));
             files.Add(new KeyValuePair<int, string>(1, "../../../../Image/6.jpg"));
-            //files.Add(new KeyValuePair<int, string>(0, "../../../../Image/7.jpg"));
+            files.Add(new KeyValuePair<int, string>(0, "../../../../Image/7.jpg"));
+            files.Add(new KeyValuePair<int, string>(0, "../../../../Image/8.png"));
             //files.Add(new KeyValuePair<int, string>(1, "../../../../Image/1.png"));
             //files.Add(new KeyValuePair<int, string>(2, "../../../../Image/2.png"));
             //files.Add(new KeyValuePair<int, string>(2, "../../../../Image/3.png"));
@@ -48,18 +49,31 @@ namespace ImageLabelingGUI
 
             this.markerThumbnailPanel1.Settings(files.ToArray());
             this.markerThumbnailPanel1.ThumbnailSelected += Form1_ThumbnailSelected;
+
+            // change status bar text
+            label2.Text = files.Count + "枚";
+
+
+            RefreshComponentsPlace();
         }
 
-        public void Form1_ThumbnailSelected(int id)
+        public void Form1_ThumbnailSelected()
         {
-            this.id = id;
-
             this.pictureBox1.Refresh();
         }
 
         private void pictureBox1_Paint(object sender, PaintEventArgs e)
         {
-            Bitmap selectedImage = new Bitmap(files[id].Value);
+            Bitmap selectedImage;
+            try
+            {
+                selectedImage = new Bitmap(markerThumbnailPanel1.Value);
+            }
+            catch (Exception)
+            {
+                selectedImage = new Bitmap(markerThumbnailPanel1.ErrorImagePath);
+            }
+            
 
             Size newSize = MarkerThumbnailPanel.ChangeSizeWhileKeepThumbnailAspectRatio(selectedImage.Size, pictureBox1.Size - new Size(50, 50));
             Bitmap resizedImage = new Bitmap(selectedImage, newSize);
@@ -67,23 +81,98 @@ namespace ImageLabelingGUI
             Graphics g = e.Graphics;
 
             // draw test
-            g.Clear(backColors[files[id].Key]);
+            g.Clear(backColors[markerThumbnailPanel1.Key]);
             g.DrawImage(resizedImage, (this.pictureBox1.Width - resizedImage.Width) / 2, (this.pictureBox1.Height - resizedImage.Height) / 2);
 
             resizedImage.Dispose();
             selectedImage.Dispose();
         }
 
-        private void Form1_SizeChanged(object sender, EventArgs e)
+        private void splitter1_SplitterMoved(object sender, SplitterEventArgs e)
         {
+            RefreshComponentsPlace();
+        }
+
+        private void Form1_Resize(object sender, EventArgs e)
+        {
+            RefreshComponentsPlace();
+        }
+
+        private void RefreshComponentsPlace()
+        {
+            button1.Width = panel1.Width / 2;
             markerThumbnailPanel1.Refresh();
             pictureBox1.Refresh();
         }
 
-        private void splitter1_SplitterMoved(object sender, SplitterEventArgs e)
+        private void button1_Click(object sender, EventArgs e)
         {
-            markerThumbnailPanel1.Refresh();
+            markerThumbnailPanel1.SetCategory(1);
+            markerThumbnailPanel1.Next();
             pictureBox1.Refresh();
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            markerThumbnailPanel1.SetCategory(2);
+            markerThumbnailPanel1.Next();
+            pictureBox1.Refresh();
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            // no entry
+            markerThumbnailPanel1.SetCategory(3);
+            markerThumbnailPanel1.Next();
+            pictureBox1.Refresh();
+        }
+
+        private void 終了ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Application.Exit();
+        }
+
+
+
+        private void カテゴリ別ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            カテゴリ別ToolStripMenuItem.Checked = !カテゴリ別ToolStripMenuItem.Checked;
+
+            // processing
+
+        }
+
+        private void 保存順ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            保存順ToolStripMenuItem.Checked = true;
+            画像ID順ToolStripMenuItem.Checked = false;
+            ユーザID順ToolStripMenuItem.Checked = false;
+            label3.Text = "保存順";
+
+            // processing
+
+        }
+
+        private void 画像ID順ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            保存順ToolStripMenuItem.Checked = false;
+            画像ID順ToolStripMenuItem.Checked = true;
+            ユーザID順ToolStripMenuItem.Checked = false;
+            label3.Text = "画像ID順";
+
+            // processing
+
+        }
+
+        private void ユーザID順ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            保存順ToolStripMenuItem.Checked = false;
+            画像ID順ToolStripMenuItem.Checked = false;
+            ユーザID順ToolStripMenuItem.Checked = true;
+            label3.Text = "ユーザID順";
+
+            // processing
+
         }
     }
 }

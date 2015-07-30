@@ -44,6 +44,9 @@ namespace ImageLabelingGUI
         // selected infomation
         int selectedNumber;
 
+        // when the owner is called Next function, this panel needs additionl scroll value
+        private int horizontalAddValue = 0;
+
         // marker line width
         public readonly int markerLineWidth = 10;
         public readonly int offsetThumbnail = 10;
@@ -51,12 +54,26 @@ namespace ImageLabelingGUI
         // scroll width
         private readonly int scrollWidth = 17;
 
+        // error image
+        public readonly string ErrorImagePath = "../../../../error.png";
+
         // thumbnail selected delegate
-        public delegate void ThumbnailSelectedFunc(int id);
+        public delegate void ThumbnailSelectedFunc();
         public ThumbnailSelectedFunc ThumbnailSelected;
 
+        // readonly accesser
+        public int Key
+        {
+            get { return files[selectedNumber].Key; }
+        }
+
+        public string Value
+        {
+            get { return files[selectedNumber].Value; }
+        }
+
         // marker color
-        private Brush[] markerBrushes = new Brush[] {Brushes.LightGray, Brushes.CornflowerBlue, Brushes.IndianRed};
+        private Brush[] markerBrushes = new Brush[] { Brushes.LightGray, Brushes.CornflowerBlue, Brushes.IndianRed, Brushes.Black };
 
         public MarkerThumbnailPanel()
         {
@@ -92,8 +109,8 @@ namespace ImageLabelingGUI
             int thumbnailNum = files.Length;
 
             // panel1 size
-            ThumbnailPanel.Width = this.Width - markerLineWidth;
-            ThumbnailPanel.Height = this.Height;
+            ThumbnailPanel.Width = this.Size.Width - markerLineWidth;
+            ThumbnailPanel.Height = this.Size.Height;
 
             // thumbnailPanel width
             pictureBox1.Width = ThumbnailPanel.Width - scrollWidth;
@@ -133,7 +150,7 @@ namespace ImageLabelingGUI
             int oldTopImageNumber = topImageNumber;
 
             // change topImageNumber by scroll value ratio
-            topImageNumber = (int)(files.Length * ThumbnailPanel.VerticalScroll.Value / (double)ThumbnailPanel.VerticalScroll.Maximum);
+            topImageNumber = (int)(files.Length * (ThumbnailPanel.VerticalScroll.Value + horizontalAddValue) / (double)ThumbnailPanel.VerticalScroll.Maximum);
 
             int oldDisplayNum = displayNum;
 
@@ -142,7 +159,7 @@ namespace ImageLabelingGUI
             if (thumbnailNum < topImageNumber + displayNum) displayNum = thumbnailNum - topImageNumber;
 
             // create thumbnail image
-            CreateThumbnailImages();
+            if (oldTopImageNumber != topImageNumber || oldDisplayNum != displayNum) CreateThumbnailImages();
         }
 
         private void CreateThumbnailImages()
@@ -164,7 +181,14 @@ namespace ImageLabelingGUI
             for (int i = 0; i < displayNum; i++)
             {
                 // load image
-                loadImage = new Bitmap(files[topImageNumber + i].Value);
+                try
+                {
+                    loadImage = new Bitmap(files[topImageNumber + i].Value);
+                }
+                catch (Exception)
+                {
+                    loadImage = new Bitmap(ErrorImagePath);
+                }
                 thumbnailBuffer[i] = new Bitmap(loadImage, ChangeSizeWhileKeepThumbnailAspectRatio(loadImage.Size, thumbnailRect.Size));
 
                 loadImage.Dispose();
@@ -184,9 +208,6 @@ namespace ImageLabelingGUI
         {
             // calculate scroll marker image height in consideration of scroll width
             int height = this.Height - scrollWidth * 2;
-
-            // create bitmap when null or need update
-            if (scrollMarker != null && scrollMarker.Height == height) return;
 
             // create bitmap
             if (scrollMarker != null) scrollMarker.Dispose();
@@ -255,14 +276,6 @@ namespace ImageLabelingGUI
             g.DrawImage(scrollMarker, 0, 0);
         }
 
-        private void ThumbnailPanel_SizeChanged(object sender, EventArgs e)
-        {
-            // if this size changed, refresh this and childs bounds
-            ResetComponentsBounds();
-
-            pictureBox1.Refresh();
-        }
-
         private void ThumbnailPanel_Scroll(object sender, ScrollEventArgs e)
         {
             // moved bertival scroll
@@ -289,7 +302,7 @@ namespace ImageLabelingGUI
 
                 ThreasholdSelectedNumber();
 
-                ThumbnailSelected(selectedNumber);
+                ThumbnailSelected();
 
                 pictureBox1.Refresh();
             }
@@ -305,15 +318,10 @@ namespace ImageLabelingGUI
 
                 ThreasholdSelectedNumber();
 
-                ThumbnailSelected(selectedNumber);
+                ThumbnailSelected();
 
                 pictureBox1.Refresh();
             }
-        }
-
-        private void ThreasholdSelectedNumber()
-        {
-            Threashold(ref selectedNumber, 0, files.Length);
         }
 
         private static void Threashold(ref int number, int min, int max)
@@ -322,14 +330,49 @@ namespace ImageLabelingGUI
             if (max <= number) number = max - 1;
         }
 
+        private void ThreasholdSelectedNumber()
+        {
+            Threashold(ref selectedNumber, 0, files.Length);
+        }
+
         private void MarkerThumbnailPanel_Resize(object sender, EventArgs e)
         {
             ResetComponentsBounds();
+
+            this.Refresh();
         }
 
         private void pictureBox1_MouseEnter(object sender, EventArgs e)
         {
             ThumbnailPanel.Focus();
+        }
+
+        public void SetCategory(int category)
+        {
+            files[selectedNumber] = new KeyValuePair<int, string>(category, files[selectedNumber].Value);
+            CreateScrollMarker();
+            this.Refresh();
+        }
+
+        public void Next()
+        {
+            //if (selectedNumber < files.Length - 1) horizontalAddValue = ThumbnailPanel.VerticalScroll.SmallChange;
+
+            selectedNumber++;
+            ThreasholdSelectedNumber();
+
+            RecalculateDisplay();
+
+            ThumbnailSelected();
+
+            //ThumbnailPanel.VerticalScroll.Value += horizontalAddValue;
+
+            // ThumbnailPanel.VerticalScroll.Value have delay by the value changing.
+            // AutoScrollPosition can change value directly.
+            ThumbnailPanel.AutoScrollPosition = new Point(0, selectedNumber * thumbnailTileHeight);
+            horizontalAddValue = 0;
+
+            this.Refresh();
         }
     }
 }

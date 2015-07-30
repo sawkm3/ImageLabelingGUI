@@ -69,7 +69,6 @@
             this.ThumbnailPanel.Size = new System.Drawing.Size(207, 150);
             this.ThumbnailPanel.TabIndex = 4;
             this.ThumbnailPanel.Scroll += new System.Windows.Forms.ScrollEventHandler(this.ThumbnailPanel_Scroll);
-            this.ThumbnailPanel.SizeChanged += new System.EventHandler(this.ThumbnailPanel_SizeChanged);
             // 
             // MarkerThumbnailPanel
             // 
